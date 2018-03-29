@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+	<!--
+	<settings>
+		 <setting name="logImpl" value="STDOUT_LOGGING" /> 
+	</settings>
+	 -->
+   
+	
+	
+	<typeAliases>
+		<package name="com.cnkeep.zhiyun.web.common.domain" />
+	</typeAliases>
+	
+	<typeHandlers>
+		<typeHandler handler="com.cnkeep.zhiyun.web.common.domain.handler.HasIndexValueEnumHandler" javaType="com.cnkeep.zhiyun.web.common.domain.enums.AccountState" jdbcType="INTEGER"></typeHandler>
+	</typeHandlers>
+	<!-- 注意: mappers 自动扫描，请按数据库名字放到com/xuanwu/ump/web/mapper/[gsms|list]即可 -->
+	<!-- 
+	<mappers> 
+		<package name="com.cnkeep.zhiyun.web.mapper"/> 
+	</mappers> 
+	-->
+</configuration>

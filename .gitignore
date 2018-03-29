@@ -1,0 +1,13 @@
+/.setting/
+/.svn/
+.svn
+.git/
+.gitigonre
+.project
+*.class
+logs/
+*/target/
+*/.settings/
+*/.svn/
+*/.classpath
+*/.project

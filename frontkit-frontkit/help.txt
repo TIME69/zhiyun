@@ -1,0 +1,15 @@
+﻿一、启动frontkit前端
+	1.安装nodejs
+		#控制台输入: node,查看是否已经安装node。
+		#如果上一步显示已经安装了nodejs，跳过此步。安装nodejs。
+	2.安装npm
+		#控制台输入: npm install 
+		#控制台输入: npm init,生成package.json，用于初始化项目nodejs服务的依赖。
+	3.安装bower
+		#控制台输入: npm intall -g bower,安装bower
+		#控制台输入: bower install 下载依赖
+		#控制台输入：bower init 生成bower.json文件，该文件用于生命前端js,css的依赖关系，类似于pom.xml。
+	4.安装gulp
+		
+	5.启动node服务
+		

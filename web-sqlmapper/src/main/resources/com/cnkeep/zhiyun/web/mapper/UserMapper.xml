@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.cnkeep.zhiyun.web.mapper.UserMapper">
+	<resultMap type="User" id="user">
+		<id column="id" property="id"/>
+		<result column="name" property="name"/>
+		<result column="identify" property="identify"/>
+		<result column="credential" property="credential"/>
+		<result column="state" property="state"/>
+		<result column="login_type" property="loginType"/>
+		<result column="trust_ips" property="trustIps"/>
+		<result column="platform_id" property="platformId"/>
+		<result column="bind_email" property="email"/>
+		<result column="last_login_time" property="lastLoginTime"/>
+	</resultMap>
+	<!-- 通过用户id获取用户信息 -->
+	<select id="getById" parameterType="int" resultMap="user">
+		select * from user where id=#{id}
+	</select>
+	
+	<select id="getUser" resultMap="user" >
+		select a.id,a.name,credential,state,last_login_time,theme from user a inner join user_auth b on a.id=b.user_id where identify=#{identify}
+	</select>
+	<select id="getRoleIds">
+		select id from zy_user_role where user_id=#{id}
+	</select>
+</mapper>

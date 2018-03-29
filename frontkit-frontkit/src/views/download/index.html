@@ -1,0 +1,47 @@
+<div class="row col-lg-12" style="padding:0px 0px 0px 50px">
+    <section id="container" class="row col-lg-9">
+        <div class="col-lg-12" ng-repeat="article in initData.articles">
+            <div class="panel panel-default panel-body">
+                <img src="http://www.aweb.cc/Uploads/Picture/2016-09-18/57de3acf4fbd0.jpg" class="pull-left" width="200">
+                <ul class="list-inline fall-bottom">
+                    <li>
+                        <h3 class=""><a href="#">{{article.title}}</a></h3>
+                    </li>
+                    <li>
+                        <span class="glyphicon glyphicon-time"></span> <span ng-bind="article.createTime"></span></li>
+                    <li>
+                        <span class="glyphicon glyphicon-eye-open"></span> (<span ng-bind="article.looksCount"></span>)
+                    </li>
+                </ul>
+                <p class="" ng-bind="article.content"></p>
+                <span class="clearfix"></span>
+            </div>
+        </div>
+        <div class="pull-right">
+            <div>
+                <ul class="pagination">
+                    <li></li>
+                    <li></li>
+                    <li><span class="current">1</span><a class="num" href="#">2</a><a class="num" href="#">3</a></li>
+                    <li><a class="next" href="#">&gt;&gt;</a></li>
+                    <li></li>
+                    <li><a> <span class="rows">共 35 条记录</span>  1/3 页</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+    <div class="col-lg-3 " style="margin-top:0px;">
+        <div class="panel panel-default" ng-repeat="new in initData.news">
+            <div class="panel-heading">
+                <a href="#" class="pull-right">更多&gt;&gt;</a>
+                <div class="title">
+                    <span class="glyphicon glyphicon-th-list"></span> {{new.title}}</div>
+            </div>
+            <ul class="panel-body">
+                <li class="item-line" ng-repeat="item in new.items">
+                    <a href="{{item.url}}">{{item.title}}</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

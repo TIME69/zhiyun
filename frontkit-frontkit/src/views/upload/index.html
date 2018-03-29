@@ -1,0 +1,249 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="zh_cn">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <script type="text/javascript" src="../../vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/angular.min.js"></script>
+    <script type="text/javascript" src="../../vendor/ng-file-upload.js"></script>
+    <script type="text/javascript" src="../../vendor/sortable.js"></script>
+    <script type="text/javascript" src="../../vendor/jquery-ui.js"></script>
+
+    <title>文件上传</title>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="Keywords" content="">
+    <meta name="Description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="black" name="apple-mobile-web-app-status-bar-style">
+    <meta content="telephone=no" name="format-detection">
+    <!-- 360的内核设置 -->
+    <meta name="renderer" content="webkit|ie-stand|ie-comp">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <link rel="stylesheet" href="http://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style type="text/css">
+        /*图片选择区设置*/
+        .selectPanel {
+            max-width: 800px;
+            height: 350px;
+        }
+
+        /*单个预览取的样式*/
+        .previewDiv {
+            width: 200px;
+            height: 150px;
+            border: 2px dashed #e3eaf3;
+            background-color: #f2f6fa;
+            /*overflow: hidden; 增加后类似于局部放大的效果*/
+            position: relative;
+            float:left;
+            margin-right: 8px;
+            margin-bottom:25px;
+        }
+        /*图片预览区的左上角数字标号样式*/
+        .num-bind{
+            width:20px;
+            height: 20px;
+            color: #ffffff;
+            background-color: #4c4c4c;
+            position: absolute; /*父元素设置为relative，子元素设置absolute，再设置top,lef,出现重叠样式*/
+            top:0px;
+            left:0px;
+            text-align: center;
+            cursor:pointer;
+        }
+
+        /*图片预览区的右上角删除按钮样式*/
+        .del-img{
+            width:22px;
+            height: 22px;
+            color: #ffffff;
+            background-image: url("../../images/del_img.png");
+            position: absolute; /*父元素设置为relative，子元素设置absolute，再设置top,left,出现重叠样式*/
+            top: -11px;
+            right:-11px;
+            cursor:pointer;
+            text-align: center;
+        }
+
+        .previewDiv img {
+            cursor: pointer;
+            transition: all 0.6s;
+        }
+        /**
+            鼠标移动上方，自动放大
+         */
+        .previewDiv img:hover {
+          //  transform: scale(1.2);
+        }
+
+        .uploadBt {
+            width: 200px;
+            height: 150px;
+            border: 1px dashed #e3eaf3;
+            background-color: #f2f6fa;
+            cursor: pointer;
+        }
+        /**
+        上传进度条
+         */
+        .upload-scroll{
+            /*圆角边框*/
+            border-radius:5px;
+            border:1px solid #cbd8e0;
+            width:90%;
+            height:12px;
+            background-color: #f2f6fa;
+            margin-top: 5px;
+            position: relative;
+        }
+        /**
+        进度百分比
+         */
+        .upload-scroll-percent-value{
+            width:100%;
+            height: 100%;
+            font:10px/12px arial;
+            position: absolute;
+            text-align: center;
+            top:0px;
+            left:0px;
+        }
+        .upload-scroll-percent{
+            /*圆角边框*/
+            border-radius:5px;
+            width:50%;
+            height: 100%;
+            background-color: #65d8a4;
+            top:0px;
+            left:0px;
+        }
+        /**
+        取消上传按钮样式
+         */
+        .cancel-upload{
+            width:12px;
+            height: 12px;
+            position: absolute;
+            top:0px;
+            right:-15px;
+            background-image: url("../../images/remove.png");
+        }
+    </style>
+</head>
+
+<body class="container">
+<div ng-controller="uploadController">
+    <section>
+        <h2>图片上传</h2>
+        <p></p>
+        <p>拖拽改变顺序，依赖于angular-ui-sortable、jquery、jquery-ui</p>
+        <p></p>
+        <p></p>
+        
+        <div class="selectPanel">
+            <div   ui-sortable="sortableOptions"  ng-model="fileList">
+                <div ng-repeat="file in fileList"  class="previewDiv pull-left">
+                    <span ng-bind="$index+1" class="num-bind"></span>
+                    <span class="del-img" title="移除" ng-click="delImg($index,file)"></span>
+                    <img ngf-src="file" alt="图片" width="100%" height="100%">
+                    <div class="upload-scroll" title="50%">
+                        <span class="cancel-upload" title="取消上传"></span>
+                        <div class="upload-scroll-percent-value">50%</div>
+                        <div class="upload-scroll-percent"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pull-left" ng-show="fileList.length < MAX_IMG_COUNT">
+                <div class="uploadBt" ngf-drop  ngf-select="selectImg()" ng-model="file" name="file" ngf-pattern="'image/*'"
+                     ngf-accept="'image/*'" ngf-max-size="20MB" multiple="multiple">
+                    <div style="font-size: 30px;margin-top: 50px" class="text-center">+</div>
+                    <div class="text-center">上传图片(最多<span ng-bind="MAX_IMG_COUNT"></span>张)</div>
+                    <div></div>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-primary clearfix" ng-click="doUpload()">上传</button>
+    </section>
+</div>
+
+</body>
+<script type="text/javascript">
+    //引入ngFileUpload,ui.sortable模块
+    var bootstrap = angular.module("upload", ['ngFileUpload','ui.sortable']);
+    bootstrap.controller("uploadController", ['$scope', 'Upload', function ($scope, Upload) {
+        $scope.test = "hello";
+        $scope.fileList = [];
+        //map存储已经选中的图片
+        $scope.selectedFiles = {};
+        //最大选择图片数量
+        $scope.MAX_IMG_COUNT = 6;
+        $scope.sortableOptions = {};
+        /**
+         * 选择图片处理
+         */
+        $scope.selectImg = function () {
+            if ($scope.file == null) {
+                return;
+            }
+
+            angular.forEach($scope.file, function (value, key) {
+                var tempKey = value.name + ":" + value.lastModified + ":" + value.size;
+                //重复的不添加，数量限制
+                if ($scope.fileList.length > $scope.MAX_IMG_COUNT-1 || $scope.selectedFiles[tempKey] != null) {
+                    return;
+                }
+                $scope.fileList.push(value);
+                $scope.selectedFiles[tempKey] = 1;
+            });
+        };
+
+        /**
+         * 移除选中的图片
+         * @param index
+         */
+        $scope.delImg = function(index,value){
+            //从选中中移除
+            $scope.fileList.splice(index,1);
+
+            //从缓存中移除
+            var tempKey = value.name + ":" + value.lastModified + ":" + value.size;
+            if(null != $scope.selectedFiles[tempKey]){
+                $scope.selectedFiles[tempKey] = null;
+            }
+        };
+
+        /**
+         * 图片上传操作
+         */
+        $scope.doUpload = function(){
+            Upload.upload({
+                url: 'https://angular-file-upload-cors-srv.appspot.com/upload',
+                data: {
+                    file: $scope.fileList[0]
+                }
+            }).then(function (resp) {
+                $timeout(function() {
+                   var log = 'file: ' +
+                        resp.config.data.file.name +
+                        ', Response: ' + JSON.stringify(resp.data) +
+                        '\n' ;
+                   console.log(log);
+                });
+            }, null, function (evt) {
+                var progressPercentage = parseInt(100.0 *
+                    evt.loaded / evt.total);
+                var log = 'progress: ' + progressPercentage +
+                    '% ' + evt.config.data.file.name + '\n';
+                console.log(log);
+            });
+        };
+
+    }]);
+
+    angular.bootstrap(document, ["upload"]);
+</script>
+</html>
