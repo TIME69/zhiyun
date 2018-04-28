@@ -1,3 +1,4 @@
+#标注git忽略的文件，添加后不会监视这些文件，不会提交至远程仓库
 .setting/
 .svn/
 .svn
@@ -11,3 +12,7 @@ logs/
 */.svn/
 */.classpath
 */.project
+
+#bower,node生成的目录
+frontkit-frontkit/bower_components/
+frontkit-frontkit/node_modules/

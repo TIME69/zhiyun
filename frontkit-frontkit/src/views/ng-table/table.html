@@ -1,0 +1,272 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html lang="zh_cn">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <script type="text/javascript" src="../../vendor/jquery.min.js"></script>
+    <script type="text/javascript" src="../../vendor/angular.min.js"></script>
+    <script type="text/javascript" src="../../vendor/sortable.js"></script>
+    <script type="text/javascript" src="../../vendor/ng-table.js"></script>
+    <script type="text/javascript" src="../../vendor/angular-strap.js"></script>
+    <script type="text/javascript" src="../../vendor/angular-strap.tpl.js"></script>
+    <link rel="stylesheet" href="../../style/bootstrap.css">
+    <link rel="stylesheet" href="../../style/ng-table.css">
+    <style type="text/css">
+        .table > thead > tr > td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table > tbody > tr > td {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        th, td {
+            text-align: center;
+            vertical-align: middle;
+            cursor: pointer;
+        }
+
+        /**
+            定义模态框背景的颜色
+         */
+        .aside-backdrop.am-fade, .modal-backdrop.am-fade {
+            background: rgba(0, 0, 0, .5);
+        }
+
+        .modal-dialog {
+            cursor: pointer;
+        }
+        .close{
+            margin-right:10px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+
+<body class="container">
+<div style="margin-top: 100px">
+
+</div>
+<div ng-controller="testTableCtrl">
+    <span ng-click="reloadData()">刷新</span>
+    <button ng-click="openModal()">打开模态框</button>
+    <button ng-click="move()">移动</button>
+    <table ng-table="users" class="table table-condensed table-bordered table-striped">
+        <tbody>
+        <tr ng-repeat="user in $data">
+            <!-- header 属性可以重新定义其内容 -->
+            <td data-title="" width="40" header="'detail.html'">
+                <input type="checkbox" name="id" value="{{user.id}}" ng-checked="user.$checked"/>
+            </td>
+            <td data-title="cols[1].title" sortable="cols[1].sortable" ng-attr-title="{{user}}">{{user.name}}</td>
+            <td data-title="cols[2].title" ng-if="0==0" sortable="cols[2].sortable">{{user.sex==0?'女':'男'}}</td>
+            <td data-title="cols[3].title" sortable="cols[3].sortable">{{user.address}}</td>
+            <!-- rowspan 合并行-->
+            <td rowspan="2" ng-if="$index%2==0">
+                <span class="btn btn-small btn-primary" data-placement="right" data-content="{{user.name}}"
+                      data-trigger="hover" bs-popover>详情
+                </span>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+
+<script type="text/ng-template" id="detail.html">
+    <input type="checkbox"/>
+</script>
+<script type="text/ng-template" id="modal.html">
+    <div>
+        <h3 ng-bind="title"></h3>
+        <section>
+            <form action="">
+                <input type="text" value="输入" placeholder="请输入...">
+            </form>
+        </section>
+    </div>
+</script>
+
+<!--模态框模板-->
+<script type="text/ng-template" id="modal/common.tpl.html">
+    <div class="modal" tabindex="" role="dialog" aria-hidden="true">
+        <div id="modal-dialog" class="modal-dialog {{diagCls ? diagCls : ''}}" ng-draggable>
+            <div class="modal-content">
+                <div class="modal-header" ng-show="title">
+
+                    <!--关闭-->
+                    <button type="button" class="close" style="margin-right: 0px;" aria-label="Close" ng-click="$hide()">
+                        <span aria-hidden="true">X</span>
+                    </button>
+                    <!--全屏-->
+                    <button type="button" class="close"  aria-label="Close" ng-click="$fullScreen()">
+                        <span aria-hidden="true" >口</span>
+                    </button>
+                    <!--缩小-->
+                    <button type="button" class="close" style="width: 14px;overflow: hidden;" aria-label="Close" ng-click="">
+                        <span aria-hidden="true" >一</span>
+                    </button>
+                    <h4 class="modal-title" ng-bind="title" style="font-weight:bold;"></h4>
+                </div>
+                <div class="modal-body" ng-bind="content"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-primary" ng-hide="okBtn.hide"
+                            ng-disabled="form.$invalid || form.$pristine" ng-click="okBtn.click()">
+                        {{okBtn.text}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    /**
+     * ng-table使用示例
+     * */
+    var app = angular.module("app", ["ngTable", 'mgcrea.ngStrap']);
+    app.config(function ($controllerProvider, $provide) {
+        app.register = {
+            controller: $controllerProvider.register,
+            factory: $provide.factory,
+            service: $provide.service
+        };
+    });
+
+
+    var initUsers = [];
+    for (var i = 1; i <= 100; i++) {
+        var user = {};
+        user.id = i;
+        user.name = "name:" + i;
+        user.sex = i % 2;
+        user.address = "address:" + i;
+        user.showDetail = false;
+        initUsers.push(user);
+    }
+    /***
+     * 常量注入
+     */
+    app.constant("initUsers", initUsers);
+
+
+    app.controller("testTableCtrl", ["$scope", "initUsers", "NgTableParams", "$modal", function ($scope, initUsers, NgTableParams, $modal) {
+        /*
+        * table初始化参数
+         */
+        var initParams = {
+            page: 1,
+            count: 10,
+            sorting: {id: "desc"}
+        };
+
+        //表头
+        $scope.cols = [
+            {field: "id", title: "id", sortable: true, show: true},
+            {field: "name", title: "姓名", sortable: "name", show: true},
+            {field: "sex", title: "性别", sortable: "sex", show: true},
+            {field: "address", title: "地址", sortable: "address", show: true},
+        ];
+        var initSettings = {
+            // page size buttons (右侧每页行数列表)
+            counts: [10, 15, 30, 50],
+            // determines the pager buttons (left set of buttons in demo)
+            paginationMaxBlocks: 5,
+            paginationMinBlocks: 1,
+            total: 0,
+            getData: function (params) {
+                return getUser(params);
+            }
+        };
+        $scope.users = new NgTableParams(initParams, initSettings);
+
+        $scope.reloadData = function () {
+            //重新加载
+            $scope.users.reload();
+        };
+        //打开模态框
+        $scope.openModal = function () {
+            var initParam = {
+                title: "modal",
+                contentTemplate: "modal.html",
+                scope: $scope,
+                templateUrl: 'modal/common.tpl.html',
+                show: false,
+                backdrop: "static",
+                keyboard: false
+            }
+            var myOtherModal = $modal(initParam);
+            // Show when some event occurs (use $promise property to ensure the template has been loaded)
+
+            myOtherModal.$promise.then(function () {
+                myOtherModal.show();
+            });
+        };
+
+        $scope.$fullScreen = function () {
+
+        }
+    }]);
+
+    var getUser = function (params) {
+        console.log(params);
+        var _params = params._params;
+        var startIndex = (_params.page - 1) * _params.count;
+        var endIndex = startIndex + _params.count;
+        var total = initUsers.length;
+        startIndex = startIndex < 0 ? 0 : startIndex;
+        endIndex = endIndex < total ? endIndex : total;
+        console.log(startIndex + "," + endIndex);
+        params.total(total);
+        return initUsers.slice(startIndex, endIndex);
+    };
+
+    /**
+     * 自定义拖拽指令
+     */
+    app.directive('ngDraggable', ['$document',function ($document) {
+        var draggable = function (scope, element, attrs) {
+            var startX = 0, startY = 0, x = 0, y = 0;
+            element.css({
+                position: 'relative',
+                cursor: 'move'
+            });
+
+            element.on('mousedown', function (event) {
+                // Prevent default dragging of selected content
+                event.preventDefault();
+                startX = event.pageX - x;
+                startY = event.pageY - y;
+                $document.on('mousemove', mousemove);
+                $document.on('mouseup', mouseup);
+            });
+
+            function mousemove(event) {
+                y = event.pageY - startY;
+                x = event.pageX - startX;
+                element.css({
+                    top: y + 'px',
+                    left: x + 'px'
+                });
+            }
+
+            function mouseup() {
+                $document.off('mousemove', mousemove);
+                $document.off('mouseup', mouseup);
+            }
+        };
+
+        return {
+            restrict: 'A',
+            link: draggable
+        };
+    }]);
+    angular.bootstrap(document, ["app"]);
+
+
+</script>
+
+
+</html>
